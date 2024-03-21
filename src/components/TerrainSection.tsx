@@ -1,0 +1,139 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import useDeviceSize from "@/hooks/use-device-size";
+import { BLOCK_SIZE, generateTerrain } from "@/utils/terrain-generation";
+import { getColorForBlock } from "@/utils/helpers";
+import { useAnimate } from "framer-motion";
+import { cn } from "@/utils/tailwind";
+import { BlockType } from "@/constants/minecraft-blocks";
+
+// Helper function to draw terrain
+const drawTerrain = async (
+  ctx: CanvasRenderingContext2D,
+  cols: number,
+  rows: number,
+) => {
+  const terrain = await generateTerrain(cols, rows);
+  terrain.forEach((row, y) => {
+    row.forEach((block, x) => {
+      drawBlock(ctx, block, x, y);
+    });
+  });
+};
+
+const drawOre = (
+  ctx: CanvasRenderingContext2D,
+  startX: number,
+  startY: number,
+  blockType: BlockType,
+) => {
+  // Basic block configuration
+  ctx.fillStyle = getColorForBlock(BlockType.STONE);
+  ctx.fillRect(startX, startY, BLOCK_SIZE, BLOCK_SIZE);
+
+  // Scale factors for drawing the ore within the block
+  const blockWidth = 200;
+  const blockHeight = 200;
+  const scaleX = BLOCK_SIZE / blockWidth;
+  const scaleY = BLOCK_SIZE / blockHeight;
+
+  ctx.fillStyle = getColorForBlock(blockType);
+
+  // Define the positions and sizes for ore pieces within the block
+  const orePieces = [
+    { x: 30, y: 30, width: 20, height: 20 },
+    { x: 70, y: 30, width: 40, height: 20 },
+    { x: 150, y: 30, width: 20, height: 40 },
+    { x: 130, y: 50, width: 20, height: 20 },
+    { x: 70, y: 70, width: 40, height: 20 },
+    { x: 50, y: 90, width: 100, height: 20 },
+    { x: 130, y: 110, width: 20, height: 20 },
+    { x: 30, y: 130, width: 20, height: 40 },
+    { x: 70, y: 130, width: 40, height: 20 },
+    { x: 90, y: 150, width: 20, height: 20 },
+    { x: 130, y: 150, width: 40, height: 20 },
+  ];
+
+  // Draw each ore piece scaled and positioned within the block
+  orePieces.forEach(({ x, y, width, height }) => {
+    ctx.fillRect(
+      startX + x * scaleX,
+      startY + y * scaleY,
+      width * scaleX,
+      height * scaleY,
+    );
+  });
+};
+
+// Usage within the main drawing function
+const drawBlock = (
+  ctx: CanvasRenderingContext2D,
+  block: BlockType,
+  x: number,
+  y: number,
+) => {
+  const startX = x * BLOCK_SIZE;
+  const startY = y * BLOCK_SIZE;
+
+  if (block.toString().includes("ORE")) {
+    drawOre(ctx, startX, startY, block);
+  } else {
+    ctx.fillStyle = getColorForBlock(block);
+    ctx.fillRect(startX, startY, BLOCK_SIZE, BLOCK_SIZE);
+  }
+};
+
+interface ITerrainSection {
+  isNight: boolean;
+}
+
+const TerrainSection = ({ isNight }: ITerrainSection) => {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const [width, height] = useDeviceSize();
+  const [scope, animate] = useAnimate();
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const canvas = ref.current;
+    const ctx = canvas.getContext("2d");
+
+    // If the canvas is not supported, return.
+    if (!ctx) return;
+
+    // Set the canvas width and height to the window width and height.
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Calculate the number of rows and columns based on the block size and canvas size.
+    const rows = height / BLOCK_SIZE;
+    const cols = width / BLOCK_SIZE;
+
+    if (cols > 0 && rows > 0) {
+      drawTerrain(ctx, cols, rows).then(() => {
+        animate("canvas", { opacity: [0, 1] }, { duration: 0.5 });
+      });
+    }
+  }, [width, height]);
+
+  return (
+    <div ref={scope}>
+      {width === null || height === null ? (
+        <p className={"h-screen w-screen bg-pink-100"}>Loading...</p>
+      ) : (
+        <canvas
+          ref={ref}
+          width={width}
+          height={height}
+          className={cn(
+            "transition-all duration-500",
+            isNight ? "brightness-50" : "brightness-90",
+          )}
+        />
+      )}
+    </div>
+  );
+};
+
+export default TerrainSection;

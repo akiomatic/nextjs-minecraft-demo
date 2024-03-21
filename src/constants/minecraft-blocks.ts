@@ -5,7 +5,7 @@ export enum BlockType {
   STONE = "STONE",
   LEAVES = "LEAVES",
   WOOD = "WOOD",
-  DEEPSLATE = "DEEPSLATE",
+  BEDROCK = "BEDROCK",
   COAL_ORE = "COAL_ORE",
   IRON_ORE = "IRON_ORE",
   DIAMOND_ORE = "DIAMOND_ORE",

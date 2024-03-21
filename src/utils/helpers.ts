@@ -33,7 +33,6 @@ export const generateOreVein = (
   startY: number,
   veinSize: number,
 ) => {
-  console.log("startX", startX, "startY", startY, "veinSize", veinSize);
   // Randomly determine the shape of the vein by generating offsets for each block in the vein
 
   const offsets = [[0, 0]];
@@ -50,16 +49,6 @@ export const generateOreVein = (
     const x = startX + offsetX;
     const y = startY + offsetY;
 
-    console.log(
-      "Generating ore vein at",
-      x,
-      y,
-      "with size",
-      veinSize,
-      "and type",
-      ore,
-    );
-
     // Ensure the block is within the bounds of the terrain
     // if (x >= 0 && x < terrain[0].length && y >= 0 && y < terrain.length) {
     if (terrain[y] === undefined || terrain[y][x] === undefined) return;
@@ -72,7 +61,6 @@ export const generateOreVein = (
 };
 
 const getOre = (y: number): BlockType => {
-  console.log("Y level", y);
   if (y >= 0.87) return BlockType.DIAMOND_ORE;
   return Math.random() > 0.75 ? BlockType.COAL_ORE : BlockType.IRON_ORE;
 };

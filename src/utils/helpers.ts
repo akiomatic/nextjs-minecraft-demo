@@ -42,8 +42,6 @@ export const generateOreVein = (
     offsets.push([offsetX, offsetY]);
   }
 
-  console.warn("Offsets", offsets);
-
   // Fill in the blocks in the vein with the ore block type
   for (const [offsetX, offsetY] of offsets) {
     const x = startX + offsetX;
@@ -54,7 +52,6 @@ export const generateOreVein = (
     if (terrain[y] === undefined || terrain[y][x] === undefined) return;
     if (terrain[y][x] !== BlockType.STONE) return;
 
-    console.warn("Replacing Ore", terrain[y][x]);
     terrain[y][x] = getOre(startY / height);
     // }
   }

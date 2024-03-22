@@ -2,8 +2,6 @@ import { BlockType } from "@/constants/minecraft-blocks";
 
 export const getColorForBlock = (blockType: BlockType): string => {
   switch (blockType) {
-    case BlockType.AIR:
-      return "";
     case BlockType.DIRT:
       return "#835d3a";
     case BlockType.GRASS:
